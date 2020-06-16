@@ -1,0 +1,21 @@
+spring:
+  port: 8080
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jingdong?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+
+
+mybatis:
+  config-locations: classpath:mybatis-config.xml
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.yyy.jingdong.entity
+logging:
+  file.max-size: 100MB
+  level:
+    root: INFO
+    com.yyy.student.mapper: debug
+
+
