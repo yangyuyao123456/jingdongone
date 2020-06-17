@@ -8,7 +8,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +16,7 @@ import java.util.UUID;
 
 /**
  * @ClassName HttpUtils
- * @Description TODO
+ * @Description http链接工具类
  * @Author yuyao.yang
  * @Date 2020/6/16 21:25
  */
@@ -28,16 +27,16 @@ public class HttpUtils {
     public HttpUtils() {
         //线程池，进行线程管理
         this.cm =new PoolingHttpClientConnectionManager();
+        this.cm.setMaxTotal(800);
+        this.cm.setDefaultMaxPerRoute(1000);
 
-        this.cm.setMaxTotal(100);
-        this.cm.setDefaultMaxPerRoute(10);
     }
     //根据请求地址下载页面数据
     public String doGetHtml(String url){
         CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(this.cm).build();
         HttpGet httpGet=new HttpGet(url);
         httpGet.setConfig(this.getConfig());
-        //设置请求Request Headers中的User-Agent，告诉京东说我这是浏览器访问，您只需要做一个安静的美男子就够了
+        //设置请求Request Headers中的User-Agent
         httpGet.addHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36");
         CloseableHttpResponse response=null;
         try {
@@ -99,9 +98,9 @@ public class HttpUtils {
     //设置请求信息
     private RequestConfig getConfig() {
         RequestConfig config=RequestConfig.custom()
-                .setConnectTimeout(1000)  //创建连接的最长时间
-                .setConnectionRequestTimeout(500) //获取连接的最长时间
-                .setSocketTimeout(100000)  //数据传输的最长时间
+                .setConnectTimeout(1000000000)  //创建连接的最长时间
+                .setConnectionRequestTimeout(500000000) //获取连接的最长时间
+                .setSocketTimeout(1000000000)  //数据传输的最长时间
                 .build();
         return config;
     }
