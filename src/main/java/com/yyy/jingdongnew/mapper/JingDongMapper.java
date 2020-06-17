@@ -23,18 +23,18 @@ public interface JingDongMapper {
      * @param item
      */
 
-    @Insert("insert into jingdong(id,sku,title,pic,url) values(" +
-            "#{id},#{sku},#{title},#{pic},#{url})")
-    public void save(Item item);
+
+    @Insert("call jingdongyyy(#{id},#{sku},#{title},#{pic},#{url})")
+     void save(Item item);
 
     /**
      * 根据商品id获取商品所有信息
-     * @param sku
+     * @param
      * @return
      */
 
-    @Select("select * from jingdong where sku=#{sku}")
+    @Select("call jingdongquerurl(#{url})")
 
-    public List<Item> findAll(@Param("sku")long sku);
+     List<String> findAll(@Param("url")String url);
 
 }

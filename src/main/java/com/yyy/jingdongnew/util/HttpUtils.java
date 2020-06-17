@@ -8,10 +8,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Component;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.UUID;
 
 /**
@@ -37,7 +34,31 @@ public class HttpUtils {
         HttpGet httpGet=new HttpGet(url);
         httpGet.setConfig(this.getConfig());
         //设置请求Request Headers中的User-Agent
-        httpGet.addHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36");
+
+
+        String[] ualist = {
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv2.0.1) Gecko/20100101 Firefox/4.0.1",
+                "Mozilla/5.0 (Windows NT 6.1; RV2.0.1) Gecko/20100101 Firefox/4.0.1",
+                "Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11",
+                "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36",
+                "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.6)",
+                "Mozilla/5.0 (Windows NT 6.1; rv:6.0.2) Gecko/20100101 Firefox/6.0.2",
+                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3423.2 Safari/537.36",
+               " Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0",
+                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.89 Safari/537.1",
+                "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1",
+                "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36",
+                " Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Geck) Chrome/53.0.2785.143 Safari/537.36"
+        };
+        for (String userAgent:ualist
+             ) {
+            httpGet.addHeader("User-Agent",userAgent);
+        }
+
         CloseableHttpResponse response=null;
         try {
             response = httpClient.execute(httpGet);
@@ -76,9 +97,6 @@ public class HttpUtils {
                     String extName = url.substring(url.lastIndexOf("."));
                     //重命名
                     String picName = UUID.randomUUID().toString()+extName;
-                    //下载图片
-                    OutputStream outputStream=new FileOutputStream(new File("D:\\image\\"+picName));
-                    response.getEntity().writeTo(outputStream);
                     return picName;
                 }
             }

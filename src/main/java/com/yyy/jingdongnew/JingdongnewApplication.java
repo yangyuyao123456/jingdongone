@@ -7,11 +7,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 @SpringBootApplication
 @EnableScheduling
 public class JingdongnewApplication {
-    @Autowired
+    @Resource
     private SpiderHandler spiderHandler;
     public static void main(String[] args) {
         SpringApplication.run(JingdongnewApplication.class, args);

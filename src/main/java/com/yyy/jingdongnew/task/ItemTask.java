@@ -2,8 +2,9 @@ package com.yyy.jingdongnew.task;
 
 
 import com.yyy.jingdongnew.entity.Item;
-import com.yyy.jingdongnew.service.impl.ItemServiceImpl;
+import com.yyy.jingdongnew.mapper.JingDongMapper;
 import com.yyy.jingdongnew.util.HttpUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,6 +13,8 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -22,13 +25,16 @@ import java.util.List;
  * @Date 2020/6/16 21:41
  */
 @Component
+@Slf4j
 public class ItemTask {
 
-    @Autowired
+    @Resource
     private HttpUtils httpUtils;
 
-    @Autowired
-    private ItemServiceImpl itemService;
+    @Resource
+    private JingDongMapper jingDongMapper;
+
+
 
     //  当下载任务完成后，间隔多长时间进行下一次的任务
     @Scheduled(fixedDelay =1*1 )
@@ -41,7 +47,7 @@ public class ItemTask {
 
 
         };
-//        String url = "https://search.jd.com/Search?keyword=%E4%B8%8A%E8%A1%A3%E5%A5%B3&enc=utf-8&suggest=2.his.0.0&wq=&pvid=fb530f9426bf461a82ff98893bac0f7e";
+
         //  遍历页面对搜索进行遍历结果
         for (int i = 1; i < 10; i=i+2) {
             for (String s:urisToGet
@@ -54,7 +60,7 @@ public class ItemTask {
             }
 
         }
-        System.out.println("数据抓取完成！！！");
+        log.info("数据抓取完成！！！");
     }
 
     /**
@@ -75,17 +81,18 @@ public class ItemTask {
                 long sku = Long.parseLong(skuEle.select("[data-sku]").attr("data-sku"));
                 //  根据sku查询商品数据
                 Item item = new Item();
-                item.setSku(sku);
-                List<Item> list =this.itemService.findAll(sku);
+                String skus=String.valueOf(sku);
+                if (StringUtils.isNotBlank(skus)){
+                    item.setSku(sku);
+                }
+                //  获取商品的详情信息
+                String itemUrl = "https://item.jd.com/"+sku+".html";
+                    item.setUrl(itemUrl);
+                List<String> list =this.jingDongMapper.findAll(itemUrl);
                 if (list.size()>0){
                     //如果商品存在，就进行下一个循环，该商品不保存，因为已存在
                     continue;
                 }
-
-                //  获取商品的详情信息
-                String itemUrl = "https://item.jd.com/"+sku+".html";
-                item.setUrl(itemUrl);
-
                 //  商品图片
                 String picUrl = skuEle.select("img[data-sku]").first().attr("data-lazy-img");
                 //	图片路径可能会为空的情况
@@ -94,15 +101,17 @@ public class ItemTask {
                 }
                 picUrl ="https:"+picUrl.replace("/n7/","/n1/");	//	替换图片格式
                 String picName = this.httpUtils.doGetImage(picUrl);
-                item.setPic(picName);
+                    item.setPic(picName);
 
                 //  商品标题
                 String itemInfo = this.httpUtils.doGetHtml(item.getUrl());
                 String title = Jsoup.parse(itemInfo).select("div.sku-name").text();
-                item.setTitle(title);
 
+                    item.setTitle(title);
+
+                log.info("新增产品：{}",item);
                 //  保存商品数据到数据库中
-                this.itemService.save(item);
+                this.jingDongMapper.save(item);
 
             }
         }
